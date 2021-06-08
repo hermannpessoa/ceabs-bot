@@ -5,6 +5,8 @@ const fs = require('fs');
 const fsExtra = require('fs-extra');
 const moment = require('moment');
 
+// see: https://www.npmjs.com/package/pdf-to-printer
+
 async function robo() {
     console.log("Iniciando Robo CEABS v0.1");
 
