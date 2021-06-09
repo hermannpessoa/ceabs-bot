@@ -12,6 +12,7 @@
   "dependencies": {
     "fs-extra": "^10.0.0",
     "moment": "^2.29.1",
+    "pdf-to-printer": "^2.0.5",
     "puppeteer": "^10.0.0"
   }
 }

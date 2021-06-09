@@ -4,10 +4,12 @@ const path = require('path')
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 const moment = require('moment');
+const printer = require('pdf-to-printer');
 
 // see: https://www.npmjs.com/package/pdf-to-printer
 
 async function robo() {
+
     console.log("Iniciando Robo CEABS v0.1");
 
     const browser = await puppeteer.launch({
@@ -108,29 +110,32 @@ async function robo() {
             
             fs.readdir(path.resolve(__dirname, './pdf'), async (err, files) => {
                 if (err){
-                    console.log(err);
+                    console.log('erro ao ler diretório de arquivos', err);
                     clearInterval(timer);
                 } else {
-                    
-                    
                     if(files.length > 0){
                         console.log("Arquivo encontrado...");
                         clearInterval(timer);
 
                         files.forEach(file => {
-                            console.log('imprimir: ' + file);
-                        })
+                            if(file.indexOf('.crdownload') > -1){
+                                console.log('OPS... arquivo ainda não está pronto para impressão... AGUARDE...');
+                                clearInterval(timer);
+                                getFilesFromFolder();
+                            }else{
+                                console.log('Imprimir arquivo: ' + file);
+                                printer
+                                    .print(`./pdf/${file}`)
+                                    .then((el) => {
+                                        console.log(`Impressão do arquivo ${file} finalizada`)
+                                    })
+                                    .catch((err) => {
+                                        console.error(`Não foi possível imprimir o arquivo ${file}, motivo: ${err}`)
+                                    });
 
-                        await page.waitForTimeout(5000).then(async () => {
-                            console.log("Limpando Diretório");
-                            fsExtra.emptyDirSync(path.resolve(__dirname, './pdf'));
-                            console.log("Robo CEABS Finalizado");
-                            await page.waitForTimeout(5000).then(async () => {
-                                await browser.close();
-                            })
+                                    finishTask();
+                            }
                         })
-
-                       
                     }else {
                         console.log('AGUARDE...');
                     }
@@ -139,6 +144,17 @@ async function robo() {
         }, 1000 );
 
         
+    }
+
+    async function finishTask(){
+        await page.waitForTimeout(5000).then(async () => {
+            console.log("Limpando Diretório");
+            fsExtra.emptyDirSync(path.resolve(__dirname, './pdf'));
+            console.log("Robo CEABS Finalizado");
+            await page.waitForTimeout(5000).then(async () => {
+                await browser.close();
+            })
+        })
     }
 }
 

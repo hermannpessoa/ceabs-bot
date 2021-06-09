@@ -1,0 +1,1 @@
+SCHTASKS /CREATE /SC DAILY /TN "CEABS" /TR %cd%\ceabs-bot.bat /ST 20:50 /v1 /it
